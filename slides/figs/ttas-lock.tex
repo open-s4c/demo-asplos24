@@ -1,0 +1,17 @@
+% Copyright (C) Huawei Technologies Co., Ltd. 2024. All rights reserved.
+% SPDX-License-Identifier: MIT
+\begin{lstlisting}[language=C, style=compact,escapeinside={//*}{\^^M}]
+// TTAS lock implementation
+// using VSync atomics (SC)
+
+typedef atomic_t lock_t;
+void lock_acquire(lock_t *lock) {
+    do {
+        while(vatomic_read(lock));//* \label{ln:ttas-await}
+    } while(vatomic_xchg(lock, 1));//* \label{ln:ttas-xchg}
+}
+void lock_release(lock_t *lock) {
+    vatomic_write(lock, 0); //* \label{ln:ttas-write}
+}
+\end{lstlisting}
+

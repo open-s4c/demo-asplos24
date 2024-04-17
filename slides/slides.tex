@@ -1,0 +1,246 @@
+% Copyright (C) Huawei Technologies Co., Ltd. 2024. All rights reserved.
+% SPDX-License-Identifier: MIT
+\documentclass[aspectratio=169]{beamer}
+
+\usetheme{huawei}
+\usepackage{lmodern}
+\usepackage{adjustbox}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{pifont}
+\usepackage{soul}
+\usepackage{tikz}
+\usepackage{underscore}
+\usepackage{varwidth}
+\usepackage{xspace}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% colors
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\colorlet{blackish}{black!60}
+\colorlet{blueish}{blue!60!black!20}
+\colorlet{blueText}{blue!60!black!50}
+\colorlet{grayish}{black!10}
+\colorlet{greenish}{green!70!black!50}
+\colorlet{light gray}{gray!10}
+\colorlet{magentish}{magenta!50!black!50}
+\colorlet{olivish}{olive!50!black!50}
+\colorlet{orangeish}{orange!60!black!30}
+\colorlet{redish}{red!60!black!60}
+
+\definecolor{HuaweiRed}{RGB}{237,28,36}
+\definecolor{darkred}{RGB}{184, 5, 69}
+\definecolor{pltblue}{HTML}{0173B2}
+\definecolor{pltgreen}{HTML}{029E73}
+\definecolor{pltred}{HTML}{D55E00}
+\definecolor{pltpurple}{HTML}{CC78BC}
+\colorlet{libvsync}{pltpurple}
+\colorlet{vsyncer}{pltblue}
+
+\newcommand{\hide}{\color{gray!70}}
+\newcommand{\unhide}{\color{black}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% listings
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\lstdefinestyle{compact}{
+	basicstyle=\scriptsize\ttfamily\color{black},
+	keywordstyle=\scriptsize\color{blue}\ttfamily,
+	commentstyle=\scriptsize\color{gray}\ttfamily,
+	stringstyle=\scriptsize\color{darkred}\ttfamily,
+	numberstyle=\tiny\color{gray},
+	columns=fullflexible,
+	tabsize=2,
+	showstringspaces=false,
+	moredelim=**[is][\color{darkred}]{@}{@},
+}
+
+\lstset{
+	language=C,
+	basicstyle=\scriptsize\ttfamily,
+	keywordstyle=\scriptsize\color{darkred}\ttfamily,
+	commentstyle=\scriptsize\color{gray!60}\ttfamily,
+	moredelim=**[is][\color{pltblue}\tiny]{|}{|},
+	escapechar=@,
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% tikz
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usetikzlibrary{
+	decorations.markings,
+	decorations.pathmorphing,
+	decorations.pathreplacing,
+	fit, spy, shapes, intersections, arrows,
+	positioning, calc,
+	shapes.geometric,
+}
+\tikzset{
+	alt/.code args={<#1>#2#3}{%
+		\alt<#1>{\pgfkeysalso{#2}}{\pgfkeysalso{#3}}
+	},
+	fill on/.style 2 args={alt=#1{fill=#2}{}},
+	warning/.style={fill=redish, text=white, font=\bf, rounded corners},
+	between/.style args={#1 and #2}{
+		at = ($(#1)!0.5!(#2)$)
+	},
+	alice/.style={draw=olive, very thick},
+	alicetxt/.style={alice, text=olive, font=\Large, rounded corners},
+	bob/.style={draw=magenta, very thick},
+	bobtxt/.style={bob, text=magenta, font=\Large, rounded corners},
+}
+\newcommand{\coord}[1]{%
+	\tikz[remember picture]\coordinate[yshift=1mm,xshift=-2mm] (#1);
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Text commands
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\eg}{eg}
+\newcommand{\xmark}{\text{\ding{55}}}
+
+\newcommand{\libvsync}{{\color{libvsync}\texttt{libvsync}}\xspace}
+\newcommand{\vsyncer}{{\color{vsyncer}{\texttt{vsyncer}}}\xspace}
+\newcommand{\award}[1][1mm]{\hspace{2mm}\tikz[overlay]\node[yshift=#1]{\includegraphics[width=1.4mm]{figs/award}};\hspace{2mm}}
+\newcommand{\bestpaper}{\award{\em\tiny Best Paper}}
+\newcommand\battery[1]{\tikz[overlay]\node{\includegraphics[width=#1]{figs/battery.png}};\,\xspace}
+\newcommand\robot[1]{\tikz[overlay]\node{\includegraphics[width=#1]{figs/smart-robot.jpg}};\,\xspace}
+\newcommand\theframerange{0-}
+\newcommand\framerange[1]{\renewcommand\theframerange{#1}}
+\newcommand{\arm}{ARMv8}
+\newcommand{\riscv}{RISC-V}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% beamer
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\setbeamertemplate{navigation symbols}{}
+\newcommand\nofootline{\setbeamertemplate{footline}{}}
+\newcommand\setfootline{\setbeamertemplate{footline}
+{%
+	\tikz[overlay]%
+	\node[font=\tiny, text=black!40, text width=\textwidth-5mm, anchor=west]
+	at (2mm, 2mm)
+	{%
+		\url{diogo.behrens@huawei.com} \hspace{15mm}
+		Safe and Scalable System Software Concurrency (S4C) Team
+		\hfill\insertframenumber/\inserttotalframenumber%
+	};
+}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% front page
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{\huge VSync: Verification and Optimization of\\[2pt]
+	Concurrent Algorithms on WMMs\\[4pt]~}
+\author{{\small Diogo Behrens --- Huawei Dresden Research Center}}
+\institute{}
+\date{{\color{black!50}\scriptsize OpenHarmony Tutorial @ ASPLOS'24}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\maketitle
+\setfootline
+\framerange{1-}
+
+\section{Introduction}
+\input {frame-years-ago}
+\input {frame-concurrency-harder}
+\input {frame-what-can-industry-do}
+\input {frame-batteries-experts}
+
+\section{Concurrency}
+\begin{frame}{}
+	\begin{columns}[T]
+	\column{.49\textwidth}{%
+		\begin{block}{{\Large Agenda}}%
+		\begin{itemize}\Large
+			\item {\hide Introduction}
+			\item {\unhide Part 1: Concurrent Monalisa}
+			\item {\hide Part 2: {\tt vsyncer} to the rescue}
+			\item {\hide Outlook}
+		\end{itemize}
+		\end{block}
+	}\hfill\column{.49\textwidth}{%
+		{\setbeamertemplate{blocks}[rounded][shadow=true]%
+		 \setbeamercolor{block title}{bg=HuaweiRed, fg=white}%
+		 \setbeamercolor{block body}{bg=redish!5}%
+		\begin{block}<2->{\Large Coding on your own}%
+			\url{github.com/open-s4c/demo-asplos24}
+
+			~\\
+
+			\begin{itemize}\small
+			\item Works best: Linux + Docker
+			\item Part 2 only: Windows + Docker
+			\item Untested: macOS (should work)
+			\end{itemize}
+
+			~\\
+			{\scriptsize\color{gray}\bf BTW, anyone with an Apple M*?}
+		\end{block}}
+	}
+	\end{columns}
+\end{frame}
+
+\input {frame-ccat-example}
+\frame{
+	\structure{\Huge Coding session \#1}\\~\\
+	Implementing an SPSC ringbuffer\ldots
+}
+\input {frame-ccat-bug}
+\frame{
+	\structure{\Huge Coding session \#2}\\~\\
+
+	Would this work on Raspberry Pi?\\
+}
+
+\section{Weak Memory Models}
+\input {frame-concurrency-wmm}
+\input {frame-ccat-wmm}
+\frame{
+	\structure{\Huge Coding session \#3}\\~\\
+
+	How to relax barriers without breaking the code?\\
+}
+\frame{%
+	\begin{block}{{\Large Agenda}}%
+	\begin{itemize}\Large
+		\item {\hide Introduction}
+		\item {\hide Part 1: Concurrent Monalisa}
+		\item {\unhide Part 2: {\tt vsyncer} to the rescue}
+		\item {\hide Outlook}
+	\end{itemize}
+	\end{block}
+}
+\input {frame-vsyncer}
+
+\frame{
+	\structure{\Huge Coding session \#4}\\~\\
+
+	What if MPMC? ARMv8? \ldots
+}
+
+\section{Outlook}
+\frame{%
+	\begin{block}{{\Large \bf Agenda}}%
+	\begin{itemize}\Large
+		\item {\hide Introduction}
+		\item {\hide Part 1: Concurrent Monalisa}
+		\item {\hide Part 2: {\tt vsyncer} to the rescue}
+		\item {\unhide Outlook}
+	\end{itemize}
+	\end{block}
+}
+
+{\nofootline\frame{
+	\structure{\Huge Do we have to always do all that work??}
+}}
+
+\input {frame-libvsync}
+\input{frame-take-aways}
+
+\makethanks
+\end{document}

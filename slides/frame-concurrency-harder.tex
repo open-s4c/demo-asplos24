@@ -1,0 +1,56 @@
+% Copyright (C) Huawei Technologies Co., Ltd. 2024. All rights reserved.
+% SPDX-License-Identifier: MIT
+\begin{frame}<\theframerange>{As the hardware evolves, so does the concurrency control}
+    \begin{columns}
+        \column{.6\textwidth}{%
+            \begin{block}{Challenges of modern hardware}
+                \begin{itemize}\small
+                    \item Many-cores everywhere
+                    \item<2-> Weak Memory Models, \eg, RISC-V, ARMv8
+                    \item<5-> Deep NUMA hierarchies
+                    \item<6-> Heterogeneous cores, \eg, big.LITTLE
+                \end{itemize}
+            \end{block}
+        \uncover<7->{%
+        \begin{block}{Consequences to concurrent software}
+            \begin{itemize}\small
+                \item<1-> {Smarter} concurrency is more complex
+                \item<8-> {Complexity gets out of control!}
+                \item<8-> {\bf Safety compromised:}\\
+                    crashes, data corruption, \ldots
+            \end{itemize}
+        \end{block}}
+        }\column{.4\textwidth}{%
+            \centering
+            \resizebox{\textwidth}{!}{%
+            \tikz[align=center,
+                n/.style = {ultra thick, line width = 1mm, font=\Large, draw=black, rounded corners, fill=grayish, minimum width=3cm},
+                a/.style = {->, line width=2mm},
+                news/.style = {draw, very thick, inner sep = 0},
+            ]{%
+                \draw[use as bounding box, draw=none, dotted] (-5mm, -100mm) rectangle (120mm, 10mm);
+
+                \node<1->[n, fill=blueish] at (-10mm, 10mm)   (hw)  {Multicore\\CPUs};
+                \node<1> [right=5mm of hw, yshift=-15mm] (num) {\includegraphics[width=120mm, clip, trim=0 0 0 20]{figs/hardware-evolution.png}};
+                \node<2->[right=10mm of hw, yshift=2mm] (num) {\includegraphics[width=60mm, clip, trim=0 0 0 20]{figs/hardware-evolution.png}};
+
+                \node<2->[n, fill=orangeish, below=35mm of hw] (sw)  {Weak\\Memory};
+                \draw<2->[a] (hw) -- (sw);
+
+                \node<3- >[right=10mm of sw] (mp) {\scalebox{1.2}{\input{figs/message-passing}}};
+
+                \node<4->[n, fill=greenish, below=35mm of sw] (alg)  {Heterogeneous\\Cores/Memory};
+                \draw<4->[a] (sw) -- (alg);
+
+                \node<5->[right=20mm of alg] (num) {\resizebox{90mm}{!}{\input{figs/numa-sys}}};
+                \node<6->[above=-22mm of num.south west, xshift=5mm] {\includegraphics[width=6cm]{figs/fast-car.png}};
+                \node<6->[above=1mm of num.south east] {\includegraphics[width=2cm]{figs/bike.png}};
+
+                \node<8->[below left=0mm and 2mm of alg] (boom){\includegraphics[width=50mm]{figs/explosion.png}};
+                \draw<8->[a, decorate, decoration={snake, post length=4mm, segment length = 5mm, amplitude = .5mm }] (alg) to[out=-90, in=0] (boom);
+
+            }
+            }
+        }
+    \end{columns}
+\end{frame}

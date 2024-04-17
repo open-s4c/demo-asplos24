@@ -1,0 +1,56 @@
+% Copyright (C) Huawei Technologies Co., Ltd. 2024. All rights reserved.
+% SPDX-License-Identifier: MIT
+
+\begin{frame}<\theframerange>[fragile]{Take Aways}
+\setul{3pt}{.6pt}
+
+\begin{tikzpicture}[
+		a/.style={ultra thick, HuaweiRed, |->},
+		n/.style={text width = .42\textwidth},
+		q1/.style={rounded corners, draw, very thick, fill=darkred, text=white},
+		q/.style={font=\Large, align=center},
+		w1/.style={fill=white, align=center},
+		%w/.style={rounded corners, draw=HuaweiRed, fill=white, align=center},
+		w/.style={rounded corners, fill=redish, text=white, align=center},
+ 	]
+ 	\draw[draw=none, use as bounding box] (-.1\textwidth, -.15\textheight) rectangle (0.9\textwidth, .5\textheight);
+	\node (a) {};
+	\coordinate[above right=4cm and 55mm of a] (d);
+
+	\node[q,left=25mm of d] (q1) {%
+		Are you building a\\ concurrent system?};
+        \node<2->[left=0mm of a] (b) {\includegraphics[width=6mm]{figs/battery.png}};
+        \node<2->[n, above right=5mm and -2mm of a, anchor=north west] (t1) {%
+	        \begin{block}{\color{libvsync}\Large libvsync}
+		{\scriptsize \url{github.com/open-s4c/libvsync}}
+		\end{block}};
+	\draw<2->[a, draw=libvsync] (q1) to[out=-90, in=90]
+		node[w,midway, fill=libvsync]
+		{Use {\bf battle-proven, WMM-verified}\\
+		synchronization primitives\\ and concurrent data structures}
+	(t1.140);
+
+	\node<3->[q,right=15mm of d] (q2) {%
+		Are you designing a new \\concurrent algorithm?};
+
+	\node<4->[right=55mm of a] (c) {\includegraphics[width=18mm]{figs/smart-robot.jpg}};
+	\node<4->[n, above right=5mm and 72mm of a, anchor=north west] (t2) {%
+		\begin{block}{\color{vsyncer}\Large vsyncer}
+		{\scriptsize \url{github.com/open-s4c/vsyncer}}
+		\end{block}};
+
+
+
+
+	\draw<4->[a, draw=vsyncer] (q2) to[out=-90, in=90]
+		node[w,midway,fill=vsyncer]
+		{Use {\bf atomics} with {\bf seq_cst barriers}.\\
+		If performance critical, {\bf optimize} barriers\\
+		with a supporting tool!}
+	(t2.140);
+
+
+	\node<5->[below right=5mm and -40mm of t1, text=redish] {Contributions and feedback welcome!};
+\end{tikzpicture}
+
+\end{frame}

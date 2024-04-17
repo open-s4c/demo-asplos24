@@ -1,0 +1,22 @@
+% Copyright (C) Huawei Technologies Co., Ltd. 2024. All rights reserved.
+% SPDX-License-Identifier: MIT
+{\nofootline
+\begin{frame}<\theframerange>{}
+\tikz[align=center,
+	n/.style = {line width=1mm, draw=HuaweiRed, rounded corners},
+	news/.style = {text=black, font=\Large},
+]{%
+	\draw[use as bounding box, draw=none, dotted]
+		(-.5\textwidth, -70mm) rectangle (.5\textwidth, 1mm);
+
+	\node<1->[news] at (0,0) (t) {%
+		{Some years ago, in this very same conference\ldots}
+	};
+	\node<1->[n, below=5mm of t] (s)
+	{\includegraphics[width=10cm, clip, trim = 0 0 0 12]{figs/vsync-paper}};
+
+	\node<1->[news, below=5mm of s] {%
+		Finally {\bf opensource} with support of OpenHarmony!
+	};
+}
+\end{frame}}

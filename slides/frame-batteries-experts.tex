@@ -1,0 +1,47 @@
+% Copyright (C) Huawei Technologies Co., Ltd. 2024. All rights reserved.
+% SPDX-License-Identifier: MIT
+\begin{frame}<\theframerange>[fragile]{The VSync Project}
+\setul{3pt}{.6pt}
+
+\begin{tikzpicture}[n/.style={text width = .42\textwidth}]
+	\node (a) {};
+
+        \node[left=0mm of a] (b) {\includegraphics[width=6mm]{figs/battery.png}};
+        \node[n, above right=5mm and -2mm of a, anchor=north west] (t1) {%
+	        \begin{block}{\color{libvsync}\Large Batteries Included}
+		\url{github.com/open-s4c/libvsync}
+
+		~\\
+		\uncover<2->{%
+			{\color{redish}\bf Don't rely on} a minimal set of
+			{\color{redish}\bf overprotected and inefficient}
+			concurrent components.\\[10pt]}
+		\uncover<3->{%
+			Instead, {\color{libvsync}\bf provide an efficient
+			and verified library} of practical components.
+			\only<4->{\bf (WIP)}}
+		\end{block}
+	};
+	\node<4>[draw=HuaweiRed, rounded corners, thick, align=center,
+		font=\scriptsize, below right = -18mm and 0 of t1]
+	{{\color{HuaweiRed} Disclaimer}:\\This is a selling pitch!\\
+		Help wanted!};
+
+	\node[right=55mm of a] (c) {\includegraphics[width=18mm]{figs/smart-robot.jpg}};
+	\node[n, above right=5mm and 72mm of a, anchor=north west] {%
+		\begin{block}{\color{vsyncer}\Large Automated Experts}
+		\url{github.com/open-s4c/vsyncer}
+
+		~\\
+		\uncover<5->{%
+			{\color{redish}\bf Avoid always relying on}
+			concurrency {\color{redish}\bf experts}!\\[10pt]}
+		\uncover<6->{%
+			Instead, {\color{vsyncer}\bf enable normal
+			programmers} to develop concurrent code supported
+			by {\color{vsyncer}\bf verification tools}.}
+		\end{block}
+	};
+\end{tikzpicture}
+
+\end{frame}

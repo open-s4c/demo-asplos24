@@ -1,0 +1,122 @@
+% \LaTeX beamer theme for Huawei
+%
+% Author: Diogo Behrens <diogo.behrens@huawei.com>
+% Date: Fri Nov  8 10:07:44 CET 2019
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{beamerthemehuawei}[2019/11/07 Huawei beamer theme]
+
+% ubuntu 22.04 texlive has issues with textbf and textem and the following
+% package.
+% See https://groups.google.com/g/linux.debian.bugs.dist/c/oQk38Pkybfk
+%\RequirePackage{CJKutf8}
+%\AtBeginDvi{\input{zhwinfonts}}
+
+% dont number appendix slides (backup)
+\RequirePackage{appendixnumberbeamer}
+\RequirePackage{authoraftertitle}
+
+\RequirePackage{tikz}
+\usetikzlibrary{positioning}
+
+\definecolor{HuaweiRed}{RGB}{237,28,36}
+
+\mode<presentation>
+\setbeamercolor{title}{fg=HuaweiRed}
+\setbeamercolor{frametitle}{fg=HuaweiRed}
+\setbeamercolor{structure}{fg=HuaweiRed}
+\setbeamercolor{footline}{fg=black!50}
+\setbeamerfont{footline}{size={\fontsize{4}{6}}}
+\setbeamertemplate{navigation symbols}{}
+
+\makeatletter
+\setbeamertemplate{frametitle}{%
+ \ifbeamercolorempty[bg]{frametitle}{}{\nointerlineskip}%
+    \@tempdima=\textwidth%
+    \advance\@tempdima by\beamer@leftmargin%
+    \advance\@tempdima by\beamer@rightmargin%
+    \begin{beamercolorbox}[sep=0.3cm,left,wd=\the\@tempdima]{frametitle}
+     \usebeamerfont{frametitle}%
+      \vbox{}\vskip-1ex%
+      \if@tempswa\else\csname beamer@fteleft\endcsname\fi%
+        \tikz[overlay]\node[opacity=1] at (140mm, 2.5mm) {\includegraphics[height=10mm]{figs/openharmony.png}};
+        \tikz[overlay]\node[opacity=1] at (150mm, 2.8mm) {\includegraphics[height=8mm]{figs/huawei-logo-red.png}};
+      \strut{\insertframetitle}\par%
+      {%
+        \ifx\insertframesubtitle\@empty%
+        \else%
+          \hspace{3.1mm}{\usebeamerfont{framesubtitle}\usebeamercolor[fg]{framesubtitle}\insertframesubtitle\strut\par}%
+        \fi\hfill%
+      }%
+      \vskip-1ex%
+      \if@tempswa\else\vskip-.3cm\fi%
+    \end{beamercolorbox}%
+  }
+  \makeatother
+
+  \setbeamertemplate{footline}[text line]{%
+    \parbox{\linewidth}{%
+      \usebeamerfont{footline}%
+      \usebeamercolor[fg]{footline}%
+      \vspace*{-8pt}%
+      {\tiny \hspace{-8mm}\insertframenumber/\inserttotalframenumber}%
+    }%
+  }
+  \mode<all>
+
+  \renewcommand{\maketitle}{{%
+      \setbeamertemplate{footline}[text line]{}%
+      \begin{frame}%
+        \makebox[\textwidth][c]{%
+          \begin{tikzpicture}
+            \useasboundingbox[draw=none] (0,0) rectangle (.9\paperwidth,.9\paperheight);
+            \node[text=HuaweiRed, anchor=north, align=center, text width=154mm] at (.5\textwidth, 50mm) (title)
+            {\fontsize{22}{20}\selectfont{\MyTitle}};
+            \node at (0.5\textwidth, 68mm){\includegraphics[height=25mm]{figs/huawei-logo-red.png}
+            \hspace{10mm}\includegraphics[height=28mm]{figs/openharmony.png}
+            };
+            \node[text=black,below=1mm of title, font=\small, align=center] {{\MyAuthor}};
+            \node[text=black, font=\small] at (0.5\textwidth, 2mm) {{\MyDate}};
+          \end{tikzpicture}%
+        }
+      \end{frame}%
+    }%
+    \setcounter{framenumber}{0}%
+  }
+
+  \newcommand{\makethanks}{{%
+      \addtocounter{framenumber}{-1}%
+      \setbeamertemplate{footline}{}%
+
+      \begin{frame}
+        \begin{center}
+          \vspace{2mm}
+          \includegraphics[width=40mm]{figs/huawei-logo-red.png}
+          \vspace{15mm}
+
+          {\color{HuaweiRed}
+            {\fontsize{34}{12}\selectfont Thank you!}\\
+            \vspace{4mm}
+
+          %  {\Large
+          %    \begin{CJK*}{UTF8}{gbsn}
+          %      非常感谢你
+          %    \end{CJK*}
+          %  }
+          }
+          \vspace{3mm}
+
+      \vspace{15mm}
+      \begin{tikzpicture}[overlay]
+        \node[draw=none, text=black, minimum width =\paperwidth, align=center, text width=1.2\paperwidth,
+        font=\setlength{\baselineskip}{3pt}\fontsize{5}{5}\selectfont
+      ] {
+          Copyright $\copyright$ \the\year{} Huawei Technologies Co., Ltd. All Rights Reserved.\\[2pt]
+          The information in this document may contain predictive statements including, without limitation, statements regarding the future financial and operating results, future product portfolio, new technology, etc. There are a number of factors that could cause actual results and developments to differ materially from those expressed or implied in the predictive statements. Therefore, such information is provided for reference purpose only and constitutes neither an offer nor an acceptance. Huawei may change the information at any time without notice.\\[10pt]
+        };
+
+      \end{tikzpicture}
+    \end{center}
+  \end{frame}
+  }%
+}

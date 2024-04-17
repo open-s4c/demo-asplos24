@@ -1,0 +1,81 @@
+% Copyright (C) Huawei Technologies Co., Ltd. 2024. All rights reserved.
+% SPDX-License-Identifier: MIT
+\begin{frame}[fragile]{How did WMM behavior break {\tt ccat}?}
+
+\begin{columns}
+\column{.5\textwidth}{%
+	\begin{itemize}\large
+		\item Independent memory accesses\\
+			can be reordered\\[8pt]
+		\item For example, reorders writes\\
+			to \lstinline|A[t % N]| and \lstinline|Tail|\\[8pt]
+		\item<2-> We need to add barriers\\[8pt]
+		\item<5> {\bf Not so simple}:
+			\begin{itemize}
+			\item How many barriers?
+			\item Where exactly?
+			\item Dependencies
+			\end{itemize}
+	\end{itemize}
+}\column{.5\textwidth}{%
+	\begin{lstlisting}
+bool enqueue(item_t *item) {
+    // space to enqueue?
+   @\coord{We1}@if (Tail - Head == N)
+       return false;
+   @\coord{We2}@uint t = Tail;
+   @\coord{We3}@A[t % N] = item;
+   @\coord{Wex}@Tail =|@\only<2->{@rel@}@| t + 1;
+   @\coord{We5}@return true;
+}
+
+item_t *dequeue() {
+    // item to dequeue?
+   @\coord{Wd1}@if (Tail|@\only<2->{@acq@}@| - Head == 0)
+       return NULL;
+   @\coord{Wd2}@uint h = Head;
+   @\coord{Wd3}@item_t *i = A[h % N];
+   @\coord{Wdx}@Head =|@\only<2->{@rel@}@| h + 1;
+   @\coord{Wd4}@return i;
+}
+\end{lstlisting}
+}%
+\end{columns}
+
+\begin{tikzpicture}[overlay, remember picture,
+		bp/.style={<-, ultra thick},
+		bx/.style={<-, dashed, thin},
+	]
+	\draw[draw=none] (We3) -- (Wex) node[midway] (pe) {};
+	\draw[draw=none] (Wd3) -- (Wdx) node[midway] (pd) {};
+	\draw<1>[<->, very thick] (We3.170)
+		-- ($(pe)+(-5mm,0)$)
+		-- (Wex.190);
+
+	\draw<3-4>[draw=blue, very thick, ->] (Wex) --
+		node[midway, above=0, font=\tiny] {release}
+		+(-1,0) to[out=180, in=180] (\tikztostart|-Wd1) --
+		node[midway, below=0, font=\tiny] {acquire}
+		(Wd1) ;
+	\node<3-4>[between=Wex and Wd1, xshift=-15mm, align=center,fill=white, font=\tiny]  {preserved\\ program order};
+
+
+
+	\draw<3>[draw=pltred, very thick, <-]
+			($(We3)+(22mm,0)$)
+			to[out=-10, in=100]
+			+(1,-8mm)
+			to[out=-80, in=40]
+			node[font=\tiny, at start, right,align=center] {write after\\read (fre)}
+			($(Wd3)+(26mm,0)$);
+
+	\draw<4>[draw=pltgreen, very thick, ->]
+			($(We3)+(22mm,0)$)
+			to[out=-10, in=100]
+			+(1,-8mm)
+			to[out=-80, in=40]
+			node[font=\tiny, at start, right,align=center] {reads\\from}
+			($(Wd3)+(26mm,0)$);
+
+\end{tikzpicture}
+\end{frame}

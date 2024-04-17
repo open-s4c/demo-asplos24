@@ -1,0 +1,100 @@
+% Copyright (C) Huawei Technologies Co., Ltd. 2024. All rights reserved.
+% SPDX-License-Identifier: MIT
+\begin{frame}<\theframerange>[fragile]{\libvsync: Solid concurrency foundations}
+	\framesubtitle{\url{github.com/open-s4c/libvsync}}
+
+    \begin{columns}[T]
+        \column{.7\textwidth}{%
+        \resizebox{\textwidth}{!}{%
+        \begin{tikzpicture}[
+            cmpt/.style = {
+            very thick,
+            draw,
+            minimum width = 20mm,
+            minimum height = 11mm,
+            rounded corners,
+            align = center
+            },
+            lvsync/.style = {
+            cmpt,
+            draw=none,
+            fill=libvsync!50,
+            }]
+            \draw[draw=none, dotted, use as bounding box] (-.8\textwidth,-8) rectangle (.8\textwidth,12mm);
+
+            \coordinate (app);
+            \node[cmpt,minimum width=45mm, left=1mm of app, anchor=south east]
+            (app1) {{\bf Application}};
+
+            \node[cmpt,minimum width=45mm, left=-1mm of app, anchor=south west]
+            (db1) {{\bf Database}\\{\small OpenGauss DB}};
+
+            \node[cmpt,below=2mm of app, minimum width=70mm]
+            (hm) {{\bf Operating System}\\{\small HongMeng, OpenHarmony, OpenEuler}};
+
+            \node[cmpt,minimum width=92mm, below=60mm of hm]
+            (hw) {{\bf Multicore CPU}\\ \arm, \riscv};
+
+            \node<2->[lvsync, minimum width=92mm, above=10mm of hw]
+            (a)  {{\bf Atomic Interface}\\ {\tt vatomic\_\{xchg, get\_add\}}};
+
+            \node<4->[lvsync, text width = 25mm, below=29mm of hm, xshift=14mm, , anchor=south east]
+            (cds) {{\bf Lockless Data Structures}\\ list, queue, hashtable, etc};
+
+            \node<4->[lvsync, text width=28mm, left=32mm of cds, yshift=-10.3mm, anchor=south west]
+            (sync) {{\bf Synchronization Primitives}\\ spinlock, mutex, rwlock, etc};
+
+            \node<4->[lvsync, text width=28mm, right=1mm of cds, yshift=-10.3mm, anchor=south west]
+            (smr) {{\bf Safe Memory Reclamation}\\ hazard-pointer, ebr, etc};
+
+            \draw[draw=gray, dashed, very thick] ($(hw)+(-4.5,10mm)$) --
+            node[text=gray, midway, fill=white] (hmm) {hardware memory model}
+            ($(hw)+(4.5,10mm)$);
+
+            \draw<2>[draw=gray, dashed, very thick] ($(a)+(-4.5,10mm)$) --
+            node[text=gray, midway,fill=white] (smm) {software memory model}
+            ($(a)+(4.5,10mm)$);
+
+            \draw<3->[draw=gray, dashed, very thick] ($(a)+(-4.5,10mm)$) --
+            node[text=gray, midway,fill=white] (smm) {VSync memory model (VMM)}
+            ($(a)+(4.5,10mm)$);
+
+            \draw<4->[draw=gray, dashed, very thick] ($(hm)+(-4.5,-10mm)$) --
+            node[text=gray, midway,fill=white] (contract) {library contract}
+            ($(hm)+(4.5,-10mm)$);
+
+            \draw<1->[->, thick, dashed] (db1) to [out=0, in=180]
+            node[at end, right=-10mm] {%
+            \includegraphics[width=35mm]{figs/opengauss.png}
+            }
+            +(70mm, 0mm);
+
+            \draw<4->[decorate, decoration={brace,amplitude=3mm,mirror}, very thick, color=libvsync] (sync.west|-contract) -- (sync.west|-hmm)
+            node[midway, left=2mm] {\battery{6mm}}
+            ;
+
+            \draw<1->[->, thick, dashed] (hm.east) to [out=0, in =180]
+            node[at end, right] {\includegraphics[width=4cm]{figs/openeuler-logo.png}}
+            +(25mm, -5mm);
+            \draw<1->[->, thick, dashed] (hm.-3) to [out=-20, in=180]
+            node[at end, right] {\includegraphics[width=45mm, clip, trim=50 50 50 50]{figs/OpenHarmonyLogo}}
+            +(70mm, -15mm);
+            \draw<1->[->, thick, dashed] (hm.south east) to [out=-45, in=180]
+            node[at end, right] {\includegraphics[width=10mm]{figs/hm}}
+            +(50mm, -25mm);
+
+
+            \draw<1->[->, thick, dashed] (hw) to[out=0, in=180]
+            node[at end, right] {\includegraphics[width=18mm]{figs/kirin}}
+            +(65mm, 5mm);
+
+            \draw<1->[->, thick, dashed] (hw.north east) to [out=45, in=180]
+            node[at end, right] {\includegraphics[width=25mm]{figs/kunpeng}}
+            +(70mm, 15mm);
+
+        \end{tikzpicture}}
+        }\hfill \column{.5\textwidth}{%
+
+        }
+    \end{columns}
+\end{frame}

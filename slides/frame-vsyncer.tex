@@ -1,0 +1,158 @@
+% Copyright (C) Huawei Technologies Co., Ltd. 2024. All rights reserved.
+% SPDX-License-Identifier: MIT
+
+\begin{frame}<\theframerange>[fragile]{Safe and Fast Concurrency on Arm processors}
+    \framesubtitle{%
+    {VSync: Push-button Verification and Optimization on WMMs --- \award Distinguished paper at ASPLOS'21}}
+
+    \vspace{1mm}
+
+\begin{tikzpicture}[
+        base/.style={anchor=center, align=center},
+        %cmpt/.style={base, fill=blue!60!black!20, rounded corners, text=black, minimum width=15mm, minimum height=10mm},
+        cmpt/.style={base, fill=libvsync!30, rounded corners, text=black, minimum width=15mm, minimum height=10mm},
+        novel/.style={cmpt, fill=vsyncer!40},
+        cmd/.style={base, fill=gray!20, text=black, font=\ttfamily},
+        file/.style={base, dashed, thin, fill=blue!20!black!20},
+        ar/.style={thick, align=center, font=\scriptsize},
+        bx/.style={minimum width=7mm, minimum height=5mm},
+        safer/.style={->, thick, draw=red!70!black, text=red!70!black },
+        faster/.style={<-, thick, draw=blue!70!black, text=blue!70!black },
+    ]
+
+    \draw[use as bounding box, draw=none, dotted] (-15mm, -.3\textheight) rectangle (12cm, .1\textheight);
+    %\node<-10>[file,align=center] (impl) {target.c};
+    \node[file,align=center] (impl) {target.c};
+    \node[below=19mm of impl.center, cmpt] (atomics) {\libvsync\\atomics};
+    \node[right=25mm of impl.center, cmd, rounded corners] (clang) {clang\\$\ge v14.0$};
+    \node[below right=19mm and 25mm of clang.center, novel] (analyzer) {barrier\\analyzer};
+    \node[above right=19mm and 25mm of analyzer.center, novel] (mutator) {mutation\\checker};
+    %\node<-10>[right=35mm of mutator.center, novel] (genmc) {model\\checker};
+    \node[right=35mm of mutator.center, novel] (genmc) {model\\checker};
+
+    %\node<-10>[below=19mm of clang.center, file, align=center] (gen) {test\_case.c};
+    \node[below=19mm of clang.center, file, align=center] (gen) {test\_case.c};
+    \node[right=30mm of analyzer.center, novel] (optimizer) {barrier\\optimizer};%
+    \node[right=30mm of optimizer.center, file] (output) {optimization\\report};
+
+    \draw[->, ar] (impl) -- (clang);
+    \draw[->, ar] (gen) --
+    (clang);
+    \draw[->, ar] (clang) -- node[midway, above] {input IR} (mutator);
+    \draw[->, ar] (clang -| analyzer) -- (analyzer);
+
+    \draw[->, ar] (mutator.9) --
+    node[midway, above] {mutated IR}
+    (genmc.170);
+    \draw[<-, ar] (mutator.-9) --
+    node[midway, below] {result}
+    (genmc.-170);
+
+    \draw[->, ar] (analyzer) --
+    node[midway, below] { \#barriers}
+    (optimizer);
+
+    \draw[->, ar] (optimizer.135) --
+    node[midway, left=1mm, align=center] {barrier-mode\\combination}
+    (mutator.-135);
+    \draw[<-, ar] (optimizer.45) --
+    node[midway, right=1mm] {status}
+    (mutator.-45);
+
+    \draw[->, ar] (optimizer) -- (output);
+    \draw[->, ar] (atomics) -- (impl);
+
+    \coordinate[below left=7mm and 12mm of atomics.center] (l1);
+    \coordinate[above left=9mm and 12mm of atomics.center] (l11);
+    \coordinate[above left=26mm and 9mm of analyzer.center] (l12);
+    \coordinate[below left=7mm and 9mm of analyzer.center] (l2);
+    \coordinate[above right=7mm and 10mm of genmc.center] (r1);
+    \coordinate[below right=7mm and 10mm of genmc.center] (r2);
+    \coordinate[below left=7mm and 10mm of genmc.center] (r3);
+    \coordinate[below right=7mm and 12mm of optimizer.center] (r4);
+    \draw[dashed, draw=vsyncer] (l12) -- (r1) -- (r2) -- (r3) -- (r4) -- (l2) -- cycle;
+    \node[above=2mm of mutator] {\vsyncer};
+
+    \node<2>[fill=gray!10, rounded corners, draw=black, ultra thick, left=-10mm of mutator, align=center] (e) {
+        \begin{adjustbox}{width=5cm,keepaspectratio}
+        \input{figs/ttas-lock} \end{adjustbox}
+    };
+    \draw<2>[->, ultra thick, gray] (impl) to [bend left] (e);
+    \node<3-9>[fill=gray!10, rounded corners, draw=white, ultra thick, above=0 of impl, align=center] (e) {
+        \begin{adjustbox}{width=2cm,keepaspectratio}
+        \input{figs/ttas-lock} \end{adjustbox}
+    };
+
+
+    %% barrier mappings
+    \node<4>[fill=gray!10, rounded corners, draw=black, ultra thick, align=center, font=\tiny] at (75mm,5mm)  (nox) {
+        \begin{adjustbox}{width=10cm,keepaspectratio}
+        \input{figs/atomics} \end{adjustbox}
+    };
+    \draw<4>[->, ultra thick, gray] (atomics) to [bend left] (nox.west);
+    \node<5-9>[fill=gray!10, rounded corners, draw=white, ultra thick, below=0 of atomics, align=center] (e) {
+        \begin{adjustbox}{width=2cm,keepaspectratio}
+        \input{figs/atomics} \end{adjustbox}
+    };
+
+    \node<6>[fill=gray!10, rounded corners, draw=black, ultra thick, right=-20mm of mutator, align=center] (e) {
+        \begin{adjustbox}{width=5cm,keepaspectratio}
+        \input{figs/client-code} \end{adjustbox}
+    };
+    \draw<6>[->, ultra thick, gray] (gen) to [bend left] (e);
+    \node<7-9>[fill=gray!10, rounded corners, draw=white, ultra thick, below=0 of gen, align=center] (e) {
+        \begin{adjustbox}{width=2cm,keepaspectratio}
+        \input{figs/client-code} \end{adjustbox}
+    };
+
+    \node<8>[fill=gray!10, rounded corners, draw=black, ultra thick, left=0 of mutator, align=center] (e) {
+        \begin{adjustbox}{width=4cm,keepaspectratio}
+        \input{figs/opt-report} \end{adjustbox}
+    };
+    \draw<8>[->, ultra thick, gray] (output) to [bend right] (e);
+    \node<9>[fill=gray!10, rounded corners, draw=white, ultra thick, below=0 of output, align=center] (e) {
+        \begin{adjustbox}{width=2cm,keepaspectratio}
+        \input{figs/opt-report} \end{adjustbox}
+    };
+
+    %\node<9>[above=7mm of mutator, text width=7cm, rounded corners,
+    %draw=red, align=center, very thick] {%
+    %{\bf Problem}: Some optimizations cause hangs on Arm CPUS! Why?};
+    %\draw<10->[red, very thick] (optimizer) to[out=-90, in=90] +(-1,-15mm) node[below, rounded corners, fill=red, text=white, font=\bf, align=center] {Adaptive Linear Relaxation};
+%    \draw<9> [fill=black!30, opacity=0.6, draw=none, rounded corners]
+%    (-1.8,1.5) -- (12,1.5) -- (12,-2.8) -- (8.7, -2.8) -- (8.7, -1) -- (6.3, -1) -- (6.3, -2.8) -- (-1.8, -2.8) -- cycle;
+
+    \node<10>[
+        line width=1mm, rounded corners, draw=red!90!black,
+        fill=white, text=black,
+        text width=100mm, align=left,
+        font=\footnotesize,
+        below left=10mm and 120mm of genmc.center,
+        anchor=west
+    ] (best)
+    {%
+        \vspace{2mm}
+
+        {\large Under the hood the {\bf best model checkers} for WMMs}\\
+
+        \begin{block}{\bf \footnotesize GenMC by MPI-SWS}
+            \begin{itemize}\setlength\itemindent{-1em}\footnotesize
+                \item \url{https://github.com/MPI-SWS/genmc}
+                \item First to verify liveness of spinloops based on our work.
+            \end{itemize}
+        \end{block}
+        \begin{block}{\bf \footnotesize Dartagnan by TU Braunschweig and Huawei DRC}
+            \begin{itemize}\setlength\itemindent{-1em}\footnotesize
+                \item \url{https://github.com/hernanponcedeleon/Dat3M}
+                \item Hernan Ponce de Leon (maintainer) joined our team in 2022
+                \item We are transforming it from an academic into a practical tool
+                \item \hspace{-2mm}\award\hspace{2mm} Gold medal at SV-COMP 2023
+                \item \hspace{-2mm}\award\hspace{-2mm}\award\hspace{2mm} Two gold medals at SV-COMP 2024
+            \end{itemize}
+        \end{block}
+    };
+    \draw<10>[<-, red, line width=1mm] (genmc) to[out=90, in = 0] (best.25);
+
+\end{tikzpicture}
+\end{frame}
+

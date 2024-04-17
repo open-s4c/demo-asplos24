@@ -1,0 +1,41 @@
+% Copyright (C) Huawei Technologies Co., Ltd. 2024. All rights reserved.
+% SPDX-License-Identifier: MIT
+\begin{lstlisting}[language=C, style=compact]
+lock_t lock;
+int v = 0; // shared state
+void run(int id) {
+    lock_acquire(&lock);
+    v++; // critical sec.
+    lock_release(&lock);
+}
+
+void main() {
+    pthread_t t[N]; // N == 3
+    for (int i=0; i < N; i++)
+        pthread_create(&t[i], 0, run, i);
+    for (int i=0; i < N; i++)
+        pthread_join(t[i], 0);
+    assert (v == N); // check of ME
+}
+\end{lstlisting}
+
+%\begin{lstlisting}[language=C, style=compact]
+%lock_t lock;
+%int v = 0; // shared state
+%void run(int id) {
+%    do {
+%        lock_acquire(&lock);
+%        v++; // critical sec.
+%        lock_release(&lock);
+%    } while (id++ == 0);
+%}
+%
+%void main() {
+%    pthread_t t[N]; // N == 3
+%    for (int i=0; i < N; i++)
+%        pthread_create(&t[i], 0, run, i);
+%    for (int i=0; i < N; i++)
+%        pthread_join(t[i], 0);
+%    assert (v == N+1); // check of ME
+%}
+%\end{lstlisting}

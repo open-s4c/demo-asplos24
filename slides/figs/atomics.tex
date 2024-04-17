@@ -1,0 +1,26 @@
+% Copyright (C) Huawei Technologies Co., Ltd. 2024. All rights reserved.
+% SPDX-License-Identifier: MIT
+\begin{tabular}{l|lll}
+    \small {\tt\color{libvsync} vatomic} & \small RISC-V & \small ARMv8 & \small x86
+    \\
+    \hline\\[-6pt]
+    \lstinline[language=C,style=compact]|vatomic_xchg| & \lstinline[language={C},style=compact]|amoswap.w.aq.rl.sc| & %\lstinline[style=compact]|SWPAL| or
+    \lstinline[style=compact]|LDAXR;STLXR| & \lstinline[style=compact]|XCHG |\\
+    \lstinline[language=C,style=compact]|vatomic_xchg_rel| & \lstinline[language={C},style=compact]|amoswap.w.rl| & %\lstinline[style=compact]|SWPL| or
+    \lstinline[style=compact]|LDXR;STLXR| & \lstinline[style=compact]|XCHG |\\
+    \lstinline[language=C,style=compact]|vatomic_xchg_acq| & \lstinline[language={C},style=compact]|amoswap.w.aq| & %\lstinline[style=compact]|SWPA| or
+    \lstinline[style=compact]|LDAXR;STXR| & \lstinline[style=compact]|XCHG |\\
+    \lstinline[language=C,style=compact]|vatomic_xchg_rlx| & \lstinline[language={C},style=compact]|amoswap.w| & %\lstinline[style=compact]|SWP| or
+    \lstinline[style=compact]|LDXR;STXR|  & \lstinline[style=compact]|XCHG|\\
+    \lstinline[language=C,style=compact]|vatomic_read| & \lstinline[language={C},style=compact]|fence [rw,rw];  lw; fence [r,rw]| & \lstinline[style=compact]|LDAR| & \lstinline[style=compact]|MOV |\\
+    \lstinline[language=C,style=compact]|vatomic_read_acq| & \lstinline[language={C},style=compact]|lw; fence [r,rw]| & \lstinline[style=compact]|LDAR|  & \lstinline[style=compact]|MOV|\\
+    \lstinline[language=C,style=compact]|vatomic_read_rlx| & \lstinline[language={C},style=compact]|lw| &  \lstinline[style=compact]|LDR|  & \lstinline[style=compact]|MOV|\\
+    \lstinline[language=C,style=compact]|vatomic_write| & \lstinline[language={C},style=compact]|fence [rw,w]; sw; fence [rw,rw]| & \lstinline[style=compact]|STLR|  & \lstinline[style=compact]|MOV;MFENCE|\\
+    \lstinline[language=C,style=compact]|vatomic_write_rel| & \lstinline[language={C},style=compact]|fence [rw,w]; sw| & \lstinline[style=compact]|STLR|  & \lstinline[style=compact]|MOV|\\
+    \lstinline[language=C,style=compact]|vatomic_write_rlx| & \lstinline[language={C},style=compact]|sw| & \lstinline[style=compact]|STR| & \lstinline[style=compact]|MOV|\\
+    \hline\\[-6pt]
+    \lstinline[language=C,style=compact]|vatomic_fence| & \lstinline[language={C},style=compact]|fence [rw,rw]| & \lstinline[style=compact]|DMB ISH|  & \lstinline[style=compact]|MFENCE|\\
+    \lstinline[language=C,style=compact]|vatomic_fence_acq| & \lstinline[language={C},style=compact]|fence [r,rw]| & \lstinline[style=compact]|DMB ISHLD| & \lstinline[style=compact]|NOP |\\
+    \lstinline[language=C,style=compact]|vatomic_fence_rel| & \lstinline[language={C},style=compact]|fence [rw,w]| & \lstinline[style=compact]|DMB ISH| & \lstinline[style=compact]|NOP |\\
+    \lstinline[language=C,style=compact]|vatomic_fence_rlx| & \lstinline[language={C},style=compact]|nop| & \lstinline[style=compact]|NOP| & \lstinline[style=compact]|NOP|
+\end{tabular}

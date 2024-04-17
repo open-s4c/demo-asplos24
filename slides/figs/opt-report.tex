@@ -1,0 +1,15 @@
+% Copyright (C) Huawei Technologies Co., Ltd. 2024. All rights reserved.
+% SPDX-License-Identifier: MIT
+\begin{lstlisting}[style=compact]
+optimization report
+-------------------
+
+lock_acquire
+  vatomic_read --> rlx
+  vatomic_xchg --> acq
+
+lock_release
+  vatomic_write --> rel
+\end{lstlisting}
+
+

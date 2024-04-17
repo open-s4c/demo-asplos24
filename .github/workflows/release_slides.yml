@@ -1,0 +1,28 @@
+name: Build and release slides
+
+on:
+  release:
+    types:
+      - published
+      - edited
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    container: ghcr.io/open-s4c/latex:latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+      - name: Build
+        run: |
+          make -C slides LATEXMK=latexmk
+          cp slides/slides.pdf slides-${{ github.event.release.tag_name }}.pdf
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: slides-${{ github.event.release.tag_name }}.pdf

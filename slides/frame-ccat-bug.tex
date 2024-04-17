@@ -1,0 +1,96 @@
+% Copyright (C) Huawei Technologies Co., Ltd. 2024. All rights reserved.
+% SPDX-License-Identifier: MIT
+\begin{frame}[fragile]{\Large So, what is the problem, again?}
+	\begin{columns}[T]
+		\column{.5\textwidth}{%
+			\begin{lstlisting}
+            #define N 8
+            item_t *A[N];
+            uint Tail = 0, Head = 0;\end{lstlisting}
+			\begin{tikzpicture}[%
+					remember picture,
+					itemsz/.style={minimum width = 5mm, minimum height = 5mm},
+					item/.style={very thick, draw, itemsz, outer sep=0},
+					cursor/.style={very thick,<-, font=\ttfamily},
+				]%
+				\useasboundingbox[draw=pltgreen, ultra thick, rounded corners] (-.3\textwidth,-.30\textheight) rectangle (.7\textwidth,.3\textheight);
+				\node[item, fill on={<2-5>}{olivish}, fill on={<6->}{magentish}] (a1) {};
+				\node[item, fill on={<3-6>}{olivish}, fill on={<7->}{magentish}, right=0 of a1] (a2) {};
+				\node[item, fill on={<4-7>}{olivish}, fill on={<8->}{magentish}, right=0 of a2] (a3) {};
+				\node[item, fill on={<16>}{olivish}, fill on={<15>}{magentish}, fill on={<17>}{magentish}, right=0 of a3] (a4) {};
+				\node[item, right=0 of a4] (a5) {};
+				\node[item, right=0 of a5] (a6) {};
+				\node[item, right=0 of a6] (a7) {};
+				\node[item, right=0 of a7] (a8) {};
+				\node[left=1mm of a1] {A =};
+
+				% insert a few items
+				\draw<1>[cursor] (a1) -- +(0, 1) node[at end, right] {Tail};
+				\draw<2>[cursor] (a2) -- +(0, 1) node[at end, right] {Tail};
+				\draw<3>[cursor] (a3) -- +(0, 1) node[at end, right] {Tail};
+				\draw<4-10>[cursor] (a4) -- +(0, 1) node[at end, right] (t) {Tail};
+
+				% consume a few items
+				\draw<-5>[cursor] (a1) -- +(0,-1) node[at end, right] {Head};
+				\draw<6>[cursor]  (a2) -- +(0,-1) node[at end, right] {Head};
+				\draw<7>[cursor]  (a3) -- +(0,-1) node[at end, right] {Head};
+				\draw<8-13>[cursor] (a4) -- +(0,-1) node[at end, right] (h) {Head};
+
+				% alice and bob
+				\node<11-16>[above=0mm of a4, text=olive] {t};
+				\draw<11->[cursor] (a5) -- +(0, 1) node[at end, right] (t) {Tail};
+				\draw<14->[cursor] (a5) -- +(0,-1) node[at end, right] (h) {Head};
+				\node<14>[below=0mm of a4, text=magenta] {h};
+
+				\node<9->[alicetxt, above=0 of t] (alice) {Producer};
+				\node<9->[bobtxt, below=0 of h] (bob) {Consumer};
+
+			\end{tikzpicture}%
+		}\column{.5\textwidth}{%
+			\vspace{2mm}
+			\begin{lstlisting}
+bool enqueue(item_t *item) {
+    // space to enqueue?
+    @\coord{e1}@if (Tail - Head == N)
+        return false;
+    @\coord{e2}@uint t = Tail@\only<-16>{++}@;
+    @\coord{e3}@A[t % N] = item;
+@\only<17>{~~~~\hspace{1ex}\coord{ex}@Tail = t + 1;@\newline}@    @\coord{e4}@return true;
+}\end{lstlisting}\pause\pause\pause\pause
+			\begin{lstlisting}
+item_t *dequeue() {
+    // item to dequeue?
+    @\coord{d1}@if (Tail - Head == 0)
+        return NULL;
+    @\coord{d2}@uint h = Head@\only<-16>{++}@;
+    @\coord{d3}@item_t *i = A[h % N];
+@\only<17>{~~~~\hspace{1ex}\coord{dx}@Head = h + 1;@\newline}@    @\coord{d4}@return i;
+}
+        \end{lstlisting}
+
+        \only<17>{\vspace{-4mm}}
+
+		}%
+	\end{columns}
+	\begin{tikzpicture}[overlay, remember picture,
+			bp/.style={<-, ultra thick},
+			bx/.style={<-, dashed, thin},
+		]
+		\draw<9>[bp,olive] (e1) -- +(-5mm,0);
+		\draw<10>[bp,olive] (e2) -- +(-5mm,0);
+		\draw<11>[bp,olive] (e3) -- +(-5mm,0);
+		\draw<12-15>[bx,olive] (e3) -- +(-5mm,0);
+		\draw<16>[bp,olive] (e4) -- +(-5mm,0);
+		\draw<12>[bp,magenta] (d1) -- +(-5mm,0);
+		\draw<13>[bp,magenta] (d2) -- +(-5mm,0);
+		\draw<14>[bp,magenta] (d3) -- +(-5mm,0);
+		\draw<15>[bp,magenta] (d4) -- +(-5mm,0);
+		\draw<16>[bx,magenta] (d4) -- +(-5mm,0);
+		\node<15-16>[left=5mm of bob, warning] {Read garbage!};
+		\draw<17>[pltgreen, ultra thick] (d2) -- +(-5mm, 0);
+		\draw<17>[pltgreen, ultra thick] (dx) -- +(-5mm, 0);
+		\draw<17>[pltgreen, ultra thick] (e2) -- +(-5mm, 0);
+		\draw<17>[pltgreen, ultra thick] (ex) -- +(-5mm, 0);
+
+	\end{tikzpicture}
+\end{frame}

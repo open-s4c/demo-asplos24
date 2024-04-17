@@ -1,0 +1,31 @@
+% Copyright (C) Huawei Technologies Co., Ltd. 2024. All rights reserved.
+% SPDX-License-Identifier: MIT
+\begin{frame}[fragile]{Weak Memory Consistency Models (WMMs)}
+	\begin{columns}[c]
+		\column{.5\textwidth}{%
+			\centering
+			\begin{itemize}\setlength{\itemindent}{-1em}
+				\item Modern architectures becoming popular\\ \eg, {Arm}, {RISC-V}\\[8pt]
+				\item<7-> {\bf Aggressive reorderings} to improve sequential performance\\[8pt]
+					%\item<7-> Nightmare for concurrent code!
+				\item<7-> {\bf Much higher non-determinisim};\\
+					even harder to test!\\[8pt]
+				\item<7-> Careful use of {\bf memory barriers}\\ (neither too many, nor too few)
+			\end{itemize}
+			%\resizebox{.5\textwidth}{!}{\input{figs/store-buffering}}
+			%\uncover<7->{\hspace{-10mm}\resizebox{.9\textwidth}{!}{\input{figs/message-passing}}}
+		}\column{.5\textwidth}{%
+			\centering
+			%\only<-7>{\resizebox{!}{.8\textheight}{%
+			\only<-7>{\resizebox{.8\textwidth}{!}{%
+					\begin{tikzpicture}[cut/.style={draw, very thick,fill=white}]
+						\draw[draw=none, dotted, use as bounding box] (0cm,-48mm) rectangle (8cm, 48mm);
+						\node<2-7>[cut] at (35mm, 25mm) (a1) {\includegraphics[width=7cm]{figs/arm-huawei}};
+						\node<3-7>[cut, below right=13mm and -1cm of a1.north] (a2) {\includegraphics[width=7cm]{figs/arm-amazon}};
+						\node<4-7>[cut, below left=18mm and -2mm of a2.north] (a3) {\includegraphics[width=7cm]{figs/arm-microsoft}};
+						\node<5-7>[cut, below right=15mm and -28mm of a2.north] (a3) {\includegraphics[width=7cm]{figs/arm-apple}};
+						\node<6-7>[cut, below right=35mm and -8cm of a2.north] (a4) {\includegraphics[width=7cm]{figs/arm-alibaba.png}};
+					\end{tikzpicture}}}%
+		}
+	\end{columns}
+\end{frame}

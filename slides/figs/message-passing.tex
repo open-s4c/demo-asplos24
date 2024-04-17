@@ -1,0 +1,32 @@
+% Copyright (C) Huawei Technologies Co., Ltd. 2024. All rights reserved.
+% SPDX-License-Identifier: MIT
+\begin{tikzpicture}[
+    a/.style = {->, thick},
+    j/.style = {fill=white, font=\scriptsize\bf},
+    b/.style = {rounded corners, align=left}, %, text width = 7mm},
+    i/.style = {b},
+    t/.style = {b, fill=light gray},
+    c/.style = {b, fill=light red, text width=34mm},
+    ]
+\coordinate (x);
+\node[i, above=10mm of x] (a) {\verb|msg = 0; ready = false;|};
+\node[t, left=5mm of x] (b1) {\verb|msg = 42;|\\ \verb|ready = true;|};
+\node[t, right=0mm of x] (b2) {\verb|while(!ready) {}|\\{\verb|assert(msg == 42);|}};
+%\node[c, below=of x] (c) {\verb+assert(a != 0 || b != 0);+};
+%\draw[a]  (a) -- (b1);
+%\draw[a]  (a) -- (b2);
+%\draw[a]  (b1) -- (c);
+%\draw[a]  (b2) -- (c);
+%\node[j, below=1mm of a] {{\tt pthread_create}};
+%\node[j, above=1mm of c] {{\tt pthread_join}};
+\node[j, above=0 of a] {Init};
+\node[j, fill=none, above=0 of b1] (t1) {Thread 1};
+\node[j, fill=none, above=0 of b2] (t2) {Thread 2};
+\node[text=HuaweiRed, right=-2mm of b2.south east, yshift=2.5mm] {\xmark};
+
+%\draw[a]  (a) -- (t1);
+%\draw[a]  (a) -- (t2);
+\draw<1->[<->, very thick, HuaweiRed] (b1.170) to [out=180, in = 90]
+node[midway, left=1mm, align=center, font=\scriptsize] {WMM\\reorder}
++(-4mm, -2mm) to [out = -90, in = 180] (b1.190);
+\end{tikzpicture}

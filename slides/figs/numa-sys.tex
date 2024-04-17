@@ -1,0 +1,78 @@
+% Copyright (C) Huawei Technologies Co., Ltd. 2024. All rights reserved.
+% SPDX-License-Identifier: MIT
+\begin{tikzpicture}[myarrow/.style={double arrow, draw=none},
+  sysbase/.style = {rounded corners, font=\bf, align=left, anchor=center},
+    system/.style = {sysbase, draw, dashed},
+    proc/.style = {sysbase, fill=grayish, solid, very thick, minimum width=4cm},
+    numa/.style = {sysbase, fill=blueish, minimum width=1cm},
+    core/.style = {sysbase, fill=white, minimum width=20mm, align=left},
+    ]
+
+  \node[system] (nsys) {%
+    \begin{tikzpicture}
+      \node[proc] (p1) {
+        Processor 1\\[4pt]
+        \begin{tikzpicture}
+          \node[numa] (n1) {Numa 1\\[4pt]
+            \begin{tikzpicture}
+              \node[core] (c1) {Core 1};
+              \node[core, below=1mm of c1] (c2) {Core 2};
+              \node[core, below=1mm of c2] (c3) {Core 3};
+              \node[core, below=1mm of c3] (c4) {Core 4};
+            \end{tikzpicture}
+          };
+          \node[numa, right=2mm of n1]{Numa 2\\[4pt]
+              \begin{tikzpicture}
+                \node[core] (c1) {Core 5};
+                \node[core, below=1mm of c1] (c2) {Core 6};
+                \node[core, below=1mm of c2] (c3) {Core 7};
+                \node[core, below=1mm of c3] (c4) {Core 8};
+              \end{tikzpicture}
+          };
+        \end{tikzpicture}
+      };
+      \node[proc, right=2mm of p1] (p2) {
+        Processor 2\\[4pt]
+        \begin{tikzpicture}
+          \node[numa] (n1) {Numa 2\\[4pt]
+            \begin{tikzpicture}
+              \node[core] (c1) {Core 9~};
+              \node[core, below=1mm of c1] (c2) {Core 10};
+              \node[core, below=1mm of c2] (c3) {Core 11};
+              \node[core, below=1mm of c3] (c4) {Core 12};
+            \end{tikzpicture}
+          };
+          \node[numa, right=2mm of n1]{Numa 3\\[4pt]
+              \begin{tikzpicture}
+                \node[core] (c1) {Core 13};
+                \node[core, below=1mm of c1] (c2) {Core 14};
+                \node[core, below=1mm of c2] (c3) {Core 15};
+                \node[core, below=1mm of c3] (c4) {Core 16};
+              \end{tikzpicture}
+          };
+        \end{tikzpicture}
+        };
+    \end{tikzpicture}
+  };
+  \node[above=3mm of nsys.north, anchor=center]{Many-core NUMA System};
+
+  \draw<1->[<->, ultra thick, rounded corners, pltgreen,line width=4pt ]
+  ($(nsys.north west) + (5mm,-16mm)$)
+  to [bend right]
+  node[midway, below left=-2mm and 4mm, font=\bf\huge, text=pltgreen, rounded corners] {fast}
+  +(-8mm,-3.5mm)
+  to [bend right]
+  ($(nsys.north west) + (5mm,-23mm)$)
+  ;
+
+  \draw<1->[<->, ultra thick, rounded corners, pltred,line width=4pt ]
+  ($(nsys.north west) + (38mm,-38mm)$)
+  to [out=-90, in=-90]
+  node[midway, below=0mm, font=\bf\huge, text=pltred, rounded corners] {slow}
+  %+(15mm,-10mm)
+  %to [out=0, in=-90]
+  ($(nsys.north west) + (68mm,-38mm)$)
+  ;
+
+\end{tikzpicture}
+
