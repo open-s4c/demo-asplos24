@@ -174,5 +174,9 @@ This demo is part of the Open Harmony Research Tutorial at ASPLOS'24.
 We thank the support of the [OpenHarmony Concurrency & Coordination TSG
 (Technical Support Group), 并发与协同TSG][tsg].
 
+The major heavy lifting in this demo is done by
+[Dartagnan](https://github.com/hernanponcedeleon/Dat3M), the model checker
+backend of `vsyncer`.
+
 [tsg]: https://www.openharmony.cn/techCommittee/aboutTSG
 
