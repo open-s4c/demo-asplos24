@@ -1,16 +1,14 @@
 # VSync demo: Concurrent `cat`
 
-> Part of the [OpenHarmony Tutorial](https://openharmonyos.org/tutorial) @ ASPLOS'24.
-
 This demo has two goals: first, to give an example of how weak memory
 consistency can affect the visible outcome of a concurrent program; second,
 to demonstrate how to use [vsyncer](https://github.com/open-s4c/vsyncer)
 to verify and optimize the barriers of that program.
 
-Both parts of the demo can be run independently and have different tooling
-requirements.
+Each goal is served by one part of the demo. Both parts can be run
+independently and have different tooling requirements.
 
-You can see pre-recorded videos in asciinema:
+You can see pre-recorded videos of the demo in asciinema:
 [part 1](https://asciinema.org/a/q7048o135HVyhHcuL4bxTzDNR)
 and
 [part 2](https://asciinema.org/a/wL8MzF1kex4ApcHrXooYONsLK).
@@ -20,10 +18,10 @@ and
 ## Part 1: Monalisa
 
 In the first part of the demo, we construct `ccat`, a simple concurrent `cat`
-program, which as the original `cat` program reads a file from the filesystem
-and displays its writes its contents to `stdout`.  Our `ccat` just contains
-enough features to allow us to show the issues with weak memory consistent,
-eg, it cannot open multiple files, not it accepts input from `stdin`.
+program that, as the original `cat` program, reads a file from the filesystem
+and writes its contents to `stdout`.  However, `ccat` just contains enough
+features to allow us to show the issues with weak memory consistency; it
+cannot open multiple files, it does not read `stdin`.
 
 The program consists of a producer thread and a consumer thread connected
 by a ring buffer.  The producer opens a file (we will use an image of
@@ -40,52 +38,61 @@ for visible differences; often the differences are obvious.
 
 ### Setup
 
-You'll need `clang` or `gcc` and `make` to compile the program.  To view
-the image files, you can open them with your favorite image viewer.
+To compile the program `ccat`, you'll need `clang` or `gcc` and `make`. To
+view the image files, open them with your favorite image viewer.
 
 We provide a script that repeatedly calls `./ccat assets/monalisa.jpg >
-output.jpg`, compares the checksum (with `md5sum`) of both files, aborting
-in case they differ.  If your system has ImageMagick's `convert` and
-[viu](https://github.com/atanunq/viu) in the executable path, the script
-will show the figures side-by-side.
+output.jpg`, compares the checksum of both files (computed with `md5sum`),
+and aborts in case the checksums differ.  If your system has ImageMagick's
+`convert` and [viu](https://github.com/atanunq/viu) in the executable path,
+the script will show the mismatching figures side-by-side.
 
 ### Compiling
 
-Simply call `make` to have `ccat` compiled.  You can test
-the program with calling `./ccat README.md`.  We will use the
-`assets/monalisa.jpg` as example. The file is resized version of [this
+To compile `ccat`, call `make`.  You can test the program with
+with `./ccat README.md`.  We will use the `assets/monalisa.jpg`
+as a running example. The Monalisa file is a resized version of [this
 file](https://upload.wikimedia.org/wikipedia/commons/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg)
 from Wikipedia.
 
-Now you can run `scripts/run.sh assets/monalisa.jpg`. Quick enough
-a different pair of figures will appear.
+Now, you can run `scripts/run.sh assets/monalisa.jpg`. In a few seconds,
+a different pair of figures should appear.
 
 ---
 
 ### Issue 1: Ring buffer does not support multiple threads
 
 Initially, `ccat` is using a version of the ring buffer that is implemented
-for single threads. One can inspect the file `ringbuf.h` and try to fix it. On
-every iteration, do not forget to recompile `ccat` and run the script again.
+for single threads. One can inspect the file `ringbuf.h` and try to fix
+it. On every fix iteration, do not forget to recompile `ccat` and run the
+script again.
 
 One possible outcome of "fixing" `ringbuf.h` might be what is in
-`ringbuf_spsc_plain.h`. You can change the include path inside `ccat.c`
-to use this file instead.  This implementation should work on x86 machines,
-and the script will not terminate.
+`ringbuf_spsc_plain.h`.  You can change the include path inside `ccat.c`
+to use this file instead of `ringbuf.h`. This implementation should work on
+x86 machines, and the script will not terminate.
+
+TODO: script should gracefully terminate after a timeout.
 
 ---
 
 ### Issue 2: Ring buffer does not work on weak memory
 
 If you have access to some machine with weak memory consistency, such as a
-Raspberry Pi 4, you can try running `ccat` with `ringbuf_spsc_plain.h`. It
-will fail with corrupting `monalisa.jpg` in similar ways. The reason is that
-the CPU can reorder memory accesses, reverting the fixes introduced from
-`ringbuf.h` to `ringbuf_spsc_plain.h`.
+Raspberry Pi 4, you can try running `ccat` with `ringbuf_spsc_plain.h`.
 
-To fix the issues, we **must** use atomic operations. The file `ringbuf_spsc.h`
-contains the sample implementation but now using atomic operations from
-[libvsync](https://github.com/open-s4c/libvsync).
+> Note: These issues should also be reproducible on several Arm-based
+smartphones as well as on Apple M1-3 processors.
+
+When running on such system, `ccat` might corrupt `monalisa.jpg` in similar
+ways as int the first experimet. The reason is that the CPU can reorder
+memory accesses, reverting the fixes introduced when going from `ringbuf.h`
+to `ringbuf_spsc_plain.h`.
+
+To fix the reordering issues, we **must** use atomic operations. The file
+`ringbuf_spsc.h` contains the same implementation but now using atomic
+operations from [libvsync](https://github.com/open-s4c/libvsync) on every
+racy access.
 
 ---
 
@@ -176,7 +183,8 @@ We thank the support of the [OpenHarmony Concurrency & Coordination TSG
 
 The major heavy lifting in this demo is done by
 [Dartagnan](https://github.com/hernanponcedeleon/Dat3M), the model checker
-backend of `vsyncer`.
+backend of `vsyncer`.  We thank [Thomas Haas](https://github.com/ThomasHaas)
+for his constant support in improving Dartagnan to work with `vsyncer`.
 
 [tsg]: https://www.openharmony.cn/techCommittee/aboutTSG
 
