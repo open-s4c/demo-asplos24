@@ -69,30 +69,32 @@ script again.
 
 One possible outcome of "fixing" `ringbuf.h` might be what is in
 `ringbuf_spsc_plain.h`.  You can change the include path inside `ccat.c`
-to use this file instead of `ringbuf.h`. This implementation should work on
-x86 machines, and the script will not terminate.
-
-TODO: script should gracefully terminate after a timeout.
+to use this file instead of `ringbuf.h`. This implementation should work
+on x86 machines, and the script will terminate after a number of iterations
+without reporting errors.
 
 ---
 
 ### Issue 2: Ring buffer does not work on weak memory
 
-If you have access to some machine with weak memory consistency, such as a
+If you have access to some machine with weak memory consistency such as a
 Raspberry Pi 4, you can try running `ccat` with `ringbuf_spsc_plain.h`.
 
 > Note: These issues should also be reproducible on several Arm-based
-smartphones as well as on Apple M1-3 processors.
+smartphones as well as on Apple M* processors.
 
 When running on such system, `ccat` might corrupt `monalisa.jpg` in similar
-ways as int the first experimet. The reason is that the CPU can reorder
-memory accesses, reverting the fixes introduced when going from `ringbuf.h`
-to `ringbuf_spsc_plain.h`.
+ways as in the first experimet. The reason is that the CPU can optimize the
+execution by reordering memory accesses, practically reverting the fixes
+introduced in software when going from `ringbuf.h` to `ringbuf_spsc_plain.h`.
 
-To fix the reordering issues, we **must** use atomic operations. The file
-`ringbuf_spsc.h` contains the same implementation but now using atomic
-operations from [libvsync](https://github.com/open-s4c/libvsync) on every
-racy access.
+To limit the hardware optimizations (as well as compiler optimization) that
+may reorder memory accesses of synchronization, we must use atomic operations
+on every racy access and possibly memory barriers. The file `ringbuf_spsc.h`
+contains the same implementation but now using atomic operations from
+[libvsync](https://github.com/open-s4c/libvsync) on every racy access.
+Each atomic operation has the strongest memory ordering (seq_cst) by default,
+which disables all relevant hardware optimizations.
 
 ---
 
@@ -101,18 +103,18 @@ racy access.
 The resulting code uses the strongest barriers on every racy access. How to
 optimize this code (relaxing barriers), without breaking its correctness?
 
-We can try to manually do that, but it is error prone. Try it out, running
-the newly compiled `ccat` with the script on an ARMv8 machine.
-
-The answer should be given in part 2 of this demo.
+We can try to manually do that, but it is a quite error prone task. Try it
+out by changing the code in `ringbuf_spsc.h`, recompiling `ccat` and reruning
+the script.  In part 2 of this demo, we will show how to use `vsyncer` to
+perform this optimization automatically while verifying the code correctness.
 
 ### Issue 4: Using TSAN
 
 Note that if you compile `ccat.c` with `-fsanitize=thread`, TSAN will report
-false positive races in the access to the array in the enqueue and dequeue
-functions, even if you are using strong barriers. The reason is that TSAN
-does not understand weak memory. Wiith `vsyncer` we should be able to use
-data race as a reliable indicator of concurrency issues.
+data races in the access to the ring buffer array between enqueue and dequeue.
+These reports are however **false positives**. TSAN does not understand weak
+memory semantics. With `vsyncer` we should be able to use data race as a reliable
+indicator of concurrency issues.
 
 ---
 
@@ -135,21 +137,26 @@ On PowerShell, run
 
     & env\vsyncer.ps1
 
+With this configuration, we will be running
+[Dartagnan](https://github.com/hernanponcedeleon/Dat3M) as backend and using
+the [VSync Memory Model](vmm.cat) as formalized hardware abstraction.
+
 ---
 
 ### Issue 1: Verifying the ring buffer
 
-One of the big limitations of model checkers is that we need to simplify
-the client code to make it manageable for the tool. In this demo we already
-provide such a client code: `verify-spsc.c`.
+One of the big limitations of model checkers is that we need to simplify the
+client code removing external calls and other unsupported features of typical
+programs. In this demo we already provide such a simplified client code:
+`verify-spsc.c`.
 
-Change the include line in the file to verify different variants of the
-ringbuffer.  Here is the command to verify the code:
+Change the include line in `verify-spsc.c` to verify different variants of the
+ringbuffer.  Here is the command to run the model checker:
 
     vsyncer check src/verify-spsc.c
 
 If you are using an implementation with atomic variables, you can also change
-the barriers from the command line, for example, making them all relaxed:
+the barriers from the command line, for example, relaxing all of them:
 
     vsyncer check -A 0 src/verify-spsc.c
 
@@ -171,7 +178,10 @@ that can be applied to the source code. Do them and subsequently try running
 
 For the interested user, we also provide a multi-producer/multi-consumer ring
 buffer. The verification of this code takes about 5 minutes on an ordinary
-laptop and the optimization may take up to 20 minutes.
+laptop and the optimization may take up to 20 minutes. See files
+
+- `ringbuf_mpmc.h`
+- `verify-mpmc.c`
 
 ---
 
@@ -181,10 +191,10 @@ This demo is part of the Open Harmony Research Tutorial at ASPLOS'24.
 We thank the support of the [OpenHarmony Concurrency & Coordination TSG
 (Technical Support Group), 并发与协同TSG][tsg].
 
-The major heavy lifting in this demo is done by
-[Dartagnan](https://github.com/hernanponcedeleon/Dat3M), the model checker
-backend of `vsyncer`.  We thank [Thomas Haas](https://github.com/ThomasHaas)
-for his constant support in improving Dartagnan to work with `vsyncer`.
+The major heavy lifting in this demo is done by [Dartagnan][dat3m],
+the model checker backend of `vsyncer`.  We thank [Thomas
+Haas](https://github.com/ThomasHaas) for his constant support in improving
+Dartagnan.
 
 [tsg]: https://www.openharmony.cn/techCommittee/aboutTSG
-
+[dat3m]: https://github.com/hernanponcedeleon/Dat3M

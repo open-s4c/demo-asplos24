@@ -6,22 +6,29 @@
 # - viu (https://github.com/atanunq/viu)
 # - convert (ImageMagick)
 # ------------------------------------------------------------------------------
-
-fn=$1 # figure filename
 catprog="./ccat"
 
+fn=$1 # figure filename
 if [ -z "$fn" ]; then
     echo "usage: $0 <figure>"
     exit 1
-fi
-
-if [ ! -f "$fn" ]; then
+elif [ ! -f "$fn" ]; then
     echo "could not find $fn"
     exit 1
 fi
 
+nit=$2 # maximum number of iterations
+if [ -z "$nit" ]; then
+    nit=100
+elif ([ "$nit" -gt 0 ] && [ "$nit" -le 1000 ]) 2> /dev/null; then
+    : # valid value
+else
+    echo "$nit is not a valid number in range = (0;1000]"
+    exit 1
+fi
+
 # check input is a figure file
-ext=$(file --extension "$fn" | cut -d":" -f2 | tr -d " ")
+ext=$(file --extension "$fn" | cut -d: -f2 | tr -d " ")
 if [ "$ext" != "jpeg/jpg/jpe/jfif" ] \
 && [ "$ext" != "png" ] \
 && [ "$ext" != "gif" ]; then
@@ -49,7 +56,7 @@ rm -f $temp $output
 expected=$(md5sum $fn | cut -d" " -f1)
 
 i=0
-time while true; do
+time while [ "$i" -lt "$nit" ]; do
     i=$(echo "$i + 1" | bc)
 
     # run test program
@@ -58,12 +65,15 @@ time while true; do
     # compare sum and stop script if they differ
     sum=$(md5sum $temp | cut -d" " -f1)
     if [ true ] && [ "$sum" != "$expected" ]; then
+        if (which convert && which viu) > /dev/null; then
+            convert $fn $temp +append $output
+            viu $output
+        fi
         echo "Incorrect md5sum @ run $i"
         echo "Expected: $expected ($fn)"
         echo "Actual  : $sum ($temp)"
-	convert $fn $temp +append $output
-	viu $output
 	exit 1
     fi
 done
 
+echo "No differences found in $i iterations"
