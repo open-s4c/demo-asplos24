@@ -47,8 +47,12 @@ void* consumer(void* arg)
     unsigned int cnt;
 
     do {
-        if (ringbuf_mpmc_deq(&queue, (void**)&d) != RINGBUF_OK)
-            continue;
+        if (ringbuf_mpmc_deq(&queue, (void**)&d) != RINGBUF_OK) {
+            // ignore executions in which dequeue did not return OK,
+            // and the loop needs to repeat
+           __VERIFIER_assume(0);
+           continue;
+        }
 
         assert(d->sent);
         d->recv = true;
