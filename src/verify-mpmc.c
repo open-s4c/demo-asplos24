@@ -6,6 +6,7 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <vsync/common/verify.h>
 #include "ringbuf_mpmc.h"
 
 #define NPRODUCERS 2
@@ -50,7 +51,7 @@ void* consumer(void* arg)
         if (ringbuf_mpmc_deq(&queue, (void**)&d) != RINGBUF_OK) {
             // ignore executions in which dequeue did not return OK,
             // and the loop needs to repeat
-           __VERIFIER_assume(0);
+           verification_ignore();
            continue;
         }
 
