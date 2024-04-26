@@ -75,7 +75,31 @@ without reporting errors.
 
 ---
 
-### Issue 2: Ring buffer does not work on weak memory
+### Issue 2: Ring buffer does not work with `-O3` (optional)
+
+In `ringbuf_enq` of `ringbuf_spsc_plain.h`, there is a preprocessor option to
+change the check to a waiting loop, ie, instead of returning `RINGBUF_FULL`
+when the ring buffer is full, the thread waits until there is space to enqueue.
+Enable that option by replacing `#if 1` with `#if 0`.
+
+Running our script, you most likely won't see any issues. Now, change the
+`Makefile` to use `-O3`. This time, when running the script, you are very
+likely to observe that the program hangs. Try running `ccat` directly on
+some file, eg `./ccat README.md`
+
+The reason is that the compiler does not know the head and tail variables
+in the ring buffer are going to be accessed by other threads. At this point,
+many compiler might find possible optimizations that when applied cause the
+concurrent program to hang.
+
+One possible (non-)solution is to use `volatile` annotation on the head and
+tail variables. See `ringbuf_spsc_volatile.h`. Nevertheless, this is not
+recommended. As we will see in the next issue, the correct solution is to
+use atomic variables.
+
+---
+
+### Issue 3: Ring buffer does not work on weak memory
 
 If you have access to some machine with weak memory consistency such as a
 Raspberry Pi 4, you can try running `ccat` with `ringbuf_spsc_plain.h`.
@@ -98,7 +122,7 @@ which disables all relevant hardware optimizations.
 
 ---
 
-### Issue 3: The barriers are too strong
+### Issue 4: The barriers are too strong
 
 The resulting code uses the strongest barriers on every racy access. How to
 optimize this code (relaxing barriers), without breaking its correctness?
@@ -108,7 +132,7 @@ out by changing the code in `ringbuf_spsc.h`, recompiling `ccat` and reruning
 the script.  In part 2 of this demo, we will show how to use `vsyncer` to
 perform this optimization automatically while verifying the code correctness.
 
-### Issue 4: Using TSAN
+### Issue 5: Using TSAN
 
 Note that if you compile `ccat.c` with `-fsanitize=thread`, TSAN will report
 data races in the access to the ring buffer array between enqueue and dequeue.
