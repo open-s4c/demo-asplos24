@@ -12,7 +12,7 @@
 #define NCONSUMERS 2
 #define NTHREADS (NPRODUCERS + NCONSUMERS)
 
-#define QUEUE_SIZE 2
+#define RBUF_SIZE 2
 #define VALUES 2
 #define TOTAL (NPRODUCERS * VALUES)
 
@@ -21,8 +21,8 @@ struct data {
     int recv;
 };
 
-void* buf[QUEUE_SIZE];
-ringbuf_mpmc_t queue;
+void* buf[RBUF_SIZE];
+ringbuf_mpmc_t rb;
 
 struct data data_items[TOTAL];
 vatomic32_t consumed = {0};
@@ -35,7 +35,7 @@ void* producer(void* arg)
         struct data* d = data_items + (produced * NPRODUCERS + id);
         d->sent = 1;
 
-        await_while (ringbuf_mpmc_enq(&queue, d) != RINGBUF_OK);
+        await_while (ringbuf_mpmc_enq(&rb, d) != RINGBUF_OK);
     }
     return 0;
 }
@@ -47,7 +47,7 @@ void* consumer(void* arg)
     unsigned int cnt;
 
     do {
-        if (ringbuf_mpmc_deq(&queue, (void**)&d) != RINGBUF_OK)
+        if (ringbuf_mpmc_deq(&rb, (void**)&d) != RINGBUF_OK)
             continue;
 
         assert(d->sent);
@@ -62,7 +62,7 @@ void* consumer(void* arg)
 
 int main(void)
 {
-    ringbuf_mpmc_init(&queue, buf, QUEUE_SIZE);
+    ringbuf_mpmc_init(&rb, buf, RBUF_SIZE);
 
     pthread_t t[NTHREADS];
 

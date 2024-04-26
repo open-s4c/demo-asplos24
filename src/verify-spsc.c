@@ -12,6 +12,7 @@
 /* ring buffer selection */
 //#include "ringbuf.h"
 //#include "ringbuf_spsc_plain.h"
+//#include "ringbuf_spsc_volatile.h"
 //#include "ringbuf_spsc_rlx.h"
 //#include "ringbuf_spsc_sc.h"
 #include "ringbuf_spsc.h"
