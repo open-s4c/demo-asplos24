@@ -5,7 +5,7 @@ CC     ?= gcc
 all: ccat
 
 clean:
-	rm -rf ccat *.ll src/*.ll
+	rm -rf ccat *.ll src/*.ll *.jpg
 
 ccat: src/ccat.c $(HEADERS)
 	$(CC) $(CFLAGS) -o $@ $<

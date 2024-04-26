@@ -31,15 +31,15 @@ ringbuf_init(ringbuf_t* q, void** b, unsigned int s)
 static inline int
 ringbuf_enq(ringbuf_t* q, void* v)
 {
-    unsigned int tail = vatomic32_read(&q->tail);
-    unsigned int head = vatomic32_read(&q->head);
+    unsigned int tail = vatomic32_read_rlx(&q->tail);
+    unsigned int head = vatomic32_read_rlx(&q->head);
 
     if (tail - head == q->size)
         return RINGBUF_FULL;
 
     q->buf[tail % q->size] = v;
 
-    vatomic32_write(&q->tail, tail + 1);
+    vatomic32_write_rel(&q->tail, tail + 1);
 
     return RINGBUF_OK;
 }
@@ -47,15 +47,15 @@ ringbuf_enq(ringbuf_t* q, void* v)
 static inline int
 ringbuf_deq(ringbuf_t* q, void** v)
 {
-    unsigned int head = vatomic32_read(&q->head);
-    unsigned int tail = vatomic32_read(&q->tail);
+    unsigned int head = vatomic32_read_rlx(&q->head);
+    unsigned int tail = vatomic32_read_acq(&q->tail);
 
     if (tail - head == 0)
         return RINGBUF_EMPTY;
 
     *v = q->buf[head % q->size];
 
-    vatomic32_write(&q->head, head + 1);
+    vatomic32_write_rel(&q->head, head + 1);
 
     return RINGBUF_OK;
 }
