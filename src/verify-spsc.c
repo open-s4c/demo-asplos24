@@ -9,13 +9,7 @@
 #include <vsync/atomic.h>
 #include <vsync/common/await_while.h>
 
-/* ring buffer selection */
-//#include "ringbuf.h"
-//#include "ringbuf_spsc_plain.h"
-//#include "ringbuf_spsc_volatile.h"
-//#include "ringbuf_spsc_rlx.h"
-//#include "ringbuf_spsc_sc.h"
-#include "ringbuf_spsc.h"
+#include "ringbuf.h"
 
 #define RBUF_SIZE 2
 #define VALUES 3
@@ -37,7 +31,7 @@ void* producer(void* arg)
 
     for (int i = 0; i < VALUES; i++) {
         struct data* d = &data_items[i];
-        d->sent = 1;
+        d->sent = true;
         await_while(ringbuf_enq(&rb, d) != RINGBUF_OK);
     }
     return 0;
@@ -68,7 +62,7 @@ int main(void)
     pthread_join(tc, 0);
 
     for (int i = 0; i < TOTAL; i++)
-        assert(data_items[i].sent == 1 && data_items[i].recv == 1);
+        assert(data_items[i].sent && data_items[i].recv);
 
     return 0;
 }
