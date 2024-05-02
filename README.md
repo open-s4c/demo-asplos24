@@ -1,17 +1,19 @@
 # VSync demo: Concurrent `cat`
 
-This demo has two goals: first, to give an example of how weak memory
+> This demo was presented at [OpenHarmony Tutorial][] during ASPLOS'24.
+> **Big thanks to all participants.**
+> The PDF slides are available [here][].
+
+[here]: https://github.com/open-s4c/demo-asplos24/releases/tag/latest
+[OpenHarmony Tutorial]: https://openharmonyos.org/tutorial
+
+The demo has two goals: first, to give an example of how weak memory
 consistency can affect the visible outcome of a concurrent program; second,
 to demonstrate how to use [vsyncer](https://github.com/open-s4c/vsyncer)
 to verify and optimize the barriers of that program.
 
 Each goal is served by one part of the demo. Both parts can be run
 independently and have different tooling requirements.
-
-You can see pre-recorded videos of the demo in asciinema:
-[part 1](https://asciinema.org/a/q7048o135HVyhHcuL4bxTzDNR)
-and
-[part 2](https://asciinema.org/a/wL8MzF1kex4ApcHrXooYONsLK).
 
 ---
 
@@ -149,7 +151,7 @@ optimize our ring buffer on weak memory models.
 
 ### Setup
 
-Install [vsyncer](https://github.com/open-s4c/vsyncer) following the
+Install [vsyncer v2.1.0](https://github.com/open-s4c/vsyncer) following the
 instructions in the `README.md`.  This part of the demo should also work on
 Windows with [Docker Desktop](Thttps://www.docker.com/products/docker-desktop)
 installed.  Opening the terminal, run the script to configure your shell.
