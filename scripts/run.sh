@@ -5,6 +5,7 @@
 # Dependencies:
 # - viu (https://github.com/atanunq/viu)
 # - convert (ImageMagick)
+# - md5 or md5sum
 # ------------------------------------------------------------------------------
 catprog="./ccat"
 
@@ -53,8 +54,12 @@ fi
 rm -f $temp $output
 
 # calculate expected MD5 sum
-expected=$(md5sum $fn | cut -d" " -f1)
-
+if [[ "$(uname -s)" = Darwin* ]]; then
+    is_mac=true
+    expected=$(md5 -q "$fn")
+else
+    expected=$(md5sum "$fn" | cut -d" " -f1)
+fi
 i=0
 time while [ "$i" -lt "$nit" ]; do
     i=$(echo "$i + 1" | bc)
@@ -63,7 +68,11 @@ time while [ "$i" -lt "$nit" ]; do
     $catprog $fn > $temp
 
     # compare sum and stop script if they differ
-    sum=$(md5sum $temp | cut -d" " -f1)
+    if [ "${is_mac}" = true ]; then
+        sum=$(md5 -q "$temp")
+    else
+        sum=$(md5sum "$temp" | cut -d" " -f1)
+    fi
     if [ true ] && [ "$sum" != "$expected" ]; then
         if (which convert && which viu) > /dev/null; then
             convert $fn $temp +append $output
